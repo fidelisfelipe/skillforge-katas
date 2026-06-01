@@ -1,4 +1,4 @@
-package io.skillforge.kata;
+package com.skillforge.kata;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

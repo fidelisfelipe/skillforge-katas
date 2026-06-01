@@ -1,4 +1,4 @@
-package io.skillforge.kata;
+package com.skillforge.kata;
 
 import java.util.List;
 import java.util.concurrent.Callable;
