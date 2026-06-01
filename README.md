@@ -9,7 +9,7 @@ Substitua um `FixedThreadPool` de 10 threads por Virtual Threads e demonstre que
 
 ## O que implementar
 
-Abra `src/main/java/io/skillforge/kata/ConcurrentExecutor.java` e implemente o método:
+Abra `src/main/java/com/skillforge/kata/ConcurrentExecutor.java` e implemente o método:
 
 ```java
 public <T> List<T> executeAll(List<Callable<T>> tasks) throws Exception
@@ -45,9 +45,17 @@ mvn test
 Quando `mvn verify` estiver verde:
 
 ```bash
-git checkout -b kata-001a-solution
+# Substitua {heroId} pelo seu heroId (ex: hero-template)
+git checkout -b kata-001a-{heroId}-solution
 git add .
 git commit -m "kata-001a: implement ConcurrentExecutor with Virtual Threads"
-git push origin kata-001a-solution
-# Abra um PR — o hub valida automaticamente
+git push origin kata-001a-{heroId}-solution
 ```
+
+Abra um PR com o seguinte body (obrigatório para o hub identificar você):
+
+```
+heroId: {heroId}
+```
+
+O hub valida automaticamente ao receber o PR.
