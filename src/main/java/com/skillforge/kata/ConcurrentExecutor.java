@@ -2,6 +2,8 @@ package com.skillforge.kata;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * KATA-001A: Virtual Threads — Hello Concurrency
@@ -19,6 +21,20 @@ import java.util.concurrent.Callable;
 public class ConcurrentExecutor {
 
     public <T> List<T> executeAll(List<Callable<T>> tasks) throws Exception {
-        throw new UnsupportedOperationException("TODO: implement using Virtual Threads");
+        if (tasks.isEmpty()) {
+            return List.of();
+        }
+        try (var exec = Executors.newVirtualThreadPerTaskExecutor()) {
+            return exec.invokeAll(tasks)
+                    .stream()
+                    .map(f -> {
+                        try {
+                            return f.get();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 }
