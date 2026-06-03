@@ -101,6 +101,13 @@ public class IssueTriager {
                 Classify the issue below and respond ONLY with valid JSON in this exact format:
                 {"category": "BUG|FEATURE|QUESTION|DOCS|OTHER", "priority": "LOW|MEDIUM|HIGH", "label": "short-label"}
 
+                Category definitions:
+                - BUG: something is broken or not working as expected (crash, error, wrong behavior)
+                - FEATURE: a request for new functionality or an enhancement to existing behavior
+                - QUESTION: a question about how to use the software
+                - DOCS: a request to improve or fix documentation
+                - OTHER: anything that does not fit the above categories
+
                 Issue Title: %s
                 Issue Body: %s
 
