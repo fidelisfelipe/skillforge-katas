@@ -61,8 +61,25 @@ public class IssueTriager {
      * Content-Type da requisição deve ser "application/json".
      */
     public TriageResult triage(IssueInput issue) {
-        // TODO: implementar
-        throw new UnsupportedOperationException("TODO: implementar triage()");
+        try {
+            String prompt = buildPrompt(issue);
+            String requestBody = mapper.writeValueAsString(
+                mapper.createObjectNode()
+                    .put("model", "llama3.2")
+                    .put("prompt", prompt)
+                    .put("stream", false)
+            );
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ollamaBaseUrl + "/api/generate"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            String llmResponse = mapper.readTree(response.body()).get("response").asText();
+            return parseResult(llmResponse);
+        } catch (Exception e) {
+            return new TriageResult(Category.OTHER, Priority.LOW, "needs-triage");
+        }
     }
 
     /**
@@ -79,8 +96,16 @@ public class IssueTriager {
      * Use text block Java (""" ... """) para o template.
      */
     public String buildPrompt(IssueInput issue) {
-        // TODO: implementar usando text block
-        throw new UnsupportedOperationException("TODO: implementar buildPrompt()");
+        return """
+                You are a GitHub issue triage assistant.
+                Classify the issue below and respond ONLY with valid JSON in this exact format:
+                {"category": "BUG|FEATURE|QUESTION|DOCS|OTHER", "priority": "LOW|MEDIUM|HIGH", "label": "short-label"}
+
+                Issue Title: %s
+                Issue Body: %s
+
+                No explanation, no markdown — just the JSON object.
+                """.formatted(issue.title(), issue.body());
     }
 
     /**
@@ -94,7 +119,20 @@ public class IssueTriager {
      * retornar: new TriageResult(Category.OTHER, Priority.LOW, "needs-triage")
      */
     public TriageResult parseResult(String llmResponse) {
-        // TODO: implementar — extrair JSON, desserializar, tratar falhas
-        throw new UnsupportedOperationException("TODO: implementar parseResult()");
+        try {
+            String json = llmResponse.trim();
+            if (json.startsWith("```")) {
+                int start = json.indexOf('\n') + 1;
+                int end = json.lastIndexOf("```");
+                json = json.substring(start, end).trim();
+            }
+            var node = mapper.readTree(json);
+            Category category = Category.valueOf(node.get("category").asText());
+            Priority priority = Priority.valueOf(node.get("priority").asText());
+            String label = node.get("label").asText();
+            return new TriageResult(category, priority, label);
+        } catch (Exception e) {
+            return new TriageResult(Category.OTHER, Priority.LOW, "needs-triage");
+        }
     }
 }
